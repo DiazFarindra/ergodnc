@@ -23,13 +23,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/tags', TagController::class);
 
 // offices
-Route::controller(OfficeController::class)->group(function () {
-    Route::get('/offices', 'index');
-    Route::get('/offices/{office}', 'show');
+Route::prefix('/offices')->controller(OfficeController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::get('/{office}', 'show');
 
     Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-        Route::post('/offices', 'store');
-        Route::put('/offices/{office}', 'update');
-        Route::delete('/offices/{office}', 'destroy');
+        Route::post('/', 'store');
+        Route::put('/{office}', 'update');
+        Route::delete('/{office}', 'destroy');
     });
 });
