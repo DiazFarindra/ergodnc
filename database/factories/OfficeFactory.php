@@ -38,15 +38,19 @@ class OfficeFactory extends Factory
 
     public function pending(): Factory
     {
-        return $this->state([
-            'approval_status' => Office::APPROVAL_PENDING,
-        ]);
+        return $this->state(function (array $attributes) {
+            return [
+                'approval_status' => Office::APPROVAL_PENDING,
+            ];
+        });
     }
 
     public function hidden(): Factory
     {
-        return $this->state([
-            'hidden' => true,
-        ]);
+        return $this->state(function (array $attributes) {
+            return [
+                'hidden' => true,
+            ];
+        });
     }
 }
