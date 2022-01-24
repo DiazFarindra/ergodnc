@@ -54,6 +54,26 @@ class OfficeControllerTest extends TestCase
     /**
     * @test
     */
+    public function itListOfficesIncludingHiddenAndUnapprovedIfFilteringForTheCurrentLoggedInUser()
+    {
+        $user = User::factory()->create()->first();
+
+        Office::factory(3)->for($user)->create();
+
+        Office::factory()->hidden()->for($user)->create();
+        Office::factory()->pending()->for($user)->create();
+
+        $this->actingAs($user);
+
+        $response = $this->get('/api/offices?user_id=' . $user->id);
+
+        $response->assertOk();
+        $response->assertJsonCount(5, 'data');
+    }
+
+    /**
+    * @test
+    */
     public function itFilterByUserId()
     {
         Office::factory(3)->create();
@@ -207,7 +227,7 @@ class OfficeControllerTest extends TestCase
     {
         Notification::fake();
 
-        $admin = User::factory()->create(['name' => 'diaz']);
+        $admin = User::factory()->create(['is_admin' => true]);
 
         $user = User::factory()->create()->first();
         $tags = Tag::factory(2)->create();
@@ -295,7 +315,7 @@ class OfficeControllerTest extends TestCase
     */
     public function itMarksTheOfficeAsPendingIfDirty()
     {
-        $admin = User::factory()->create(['name' => 'diaz']);
+        $admin = User::factory()->create(['is_admin' => true]);
 
         Notification::fake();
 
