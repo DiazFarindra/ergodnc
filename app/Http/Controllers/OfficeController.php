@@ -24,12 +24,15 @@ class OfficeController extends Controller
     public function index(): AnonymousResourceCollection
     {
         $offices = Office::query()
-            ->where('approval_status', Office::APPROVAL_APPROVED)
-            ->where('hidden', false)
+            ->when(request('user_id') && auth()->user() && request('user_id') == auth()->id(),
+                fn ($builder) => $builder,
+                fn ($builder) => $builder->where('approval_status', Office::APPROVAL_APPROVED)->where('hidden', false),
+            )
             ->when(request('user_id'), fn ($builder) => $builder->where('user_id', request('user_id')))
             ->when(request('visitor_id'),
                 fn (Builder $builder)
-                    => $builder->whereRelation('reservations', 'user_id', '=', request('visitor_id')))
+                    => $builder->whereRelation('reservations', 'user_id', '=', request('visitor_id'))
+            )
             ->when(
                 request('lat') && request('lng'),
                 fn ($builder) => $builder->nearestTo(request('lat'), request('lng')),
@@ -78,7 +81,7 @@ class OfficeController extends Controller
             return $office;
         });
 
-        Notification::send(User::firstWhere('name', 'diaz'), new OfficePendingApproval($office));
+        Notification::send(User::where('is_admin', true)->get(), new OfficePendingApproval($office));
 
         return OfficeResource::make(
             $office->load(['images', 'tags', 'user'])
@@ -110,7 +113,7 @@ class OfficeController extends Controller
         });
 
         if ($review) {
-            Notification::send(User::firstWhere('name', 'diaz'), new OfficePendingApproval($office));
+            Notification::send(User::where('is_admin', true)->get(), new OfficePendingApproval($office));
         }
 
         return OfficeResource::make(
