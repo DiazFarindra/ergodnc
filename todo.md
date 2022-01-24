@@ -65,6 +65,8 @@
 - [x] Cannot delete an office that has a reservation
 
 ## TODO 5/9
+- [x] Identify who an admin is by adding an `is_admin` attribute to the user table
+- [x] Show hidden and unapproved offices when filtering by `user_id` and the auth use matches the user so host can see all their listings
 
 ## Office Photos
 - [] Attaching photos to and office
