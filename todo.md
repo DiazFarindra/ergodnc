@@ -69,9 +69,9 @@
 - [x] Show hidden and unapproved offices when filtering by `user_id` and the auth use matches the user so host can see all their listings
 
 ## Office Photos
-- [] Attaching photos to and office
-- [] Allow choosing a photo to become the featured photo
-- [] Deleting a photo
+- [x] Attaching photos to and office
+- [x] Allow choosing a photo to become the featured photo
+- [x] Deleting a photo
     - Must have at least one photo if it's approved
 
 ## List Reservations Endpoint
