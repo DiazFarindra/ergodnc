@@ -19,6 +19,7 @@ class OfficeValidator
 
             'hidden' => ['bool'],
             'monthly_discount' => ['integer', 'max:90'],
+            'featured_image_id' => ['nullable', Rule::exists('images', 'id')->where('resource_type', 'office')->where('resource_id', $office->id)],
 
             'tags' => ['array'],
             'tags.*' => ['integer', Rule::exists('tags', 'id')]
