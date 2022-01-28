@@ -9,19 +9,17 @@ use App\Models\User;
 use App\Models\Validators\OfficeValidator;
 use App\Notifications\OfficePendingApproval;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class OfficeController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(): JsonResource
     {
         $offices = Office::query()
             ->when(request('user_id') && auth()->user() && request('user_id') == auth()->id(),
@@ -132,6 +130,11 @@ class OfficeController extends Controller
         if ($office->reservations()->where('status', Reservation::STATUS_ACTIVE)->exists()) {
             throw ValidationException::withMessages(['office' => 'cannot delete this office!']);
         }
+
+        $office->images()->each(function ($image) {
+            Storage::delete($image->path);
+            $image->delete();
+        });
 
         $office->delete();
     }
