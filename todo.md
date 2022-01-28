@@ -74,10 +74,16 @@
 - [x] Deleting a photo
     - Must have at least one photo if it's approved
 
+## TODO 6/9
+- [x] Deleting all image when deleting an office
+- [x] Use the default disk to store public image so it's easier to switch to different drivers in production
+- [] Switch to using sanctum guard by default
+- [x] Use keyed implicit binding in the office image routes so laravel scope to the office that image belongs to [tweet](https://twitter.com/stellamatix)
+
 ## List Reservations Endpoint
-- [] Must be authenticated & email verified
-- [] Token (if exists) must allow `reservations.show`
-- [] Can only list their own reservations or reservations n their offices
+- [x] Must be authenticated & email verified
+- [x] Token (if exists) must allow `reservations.show`
+- [] Can only list their own reservations or reservations on their offices
 - [] Allow filtering by office_id
 - [] Allow filtering by user_id
 - [] Allow filtering by date range
