@@ -19,7 +19,7 @@ class OfficeImageControllerTest extends TestCase
      */
     public function itUploadsAnImageAndStoredItUnderTheOffice()
     {
-        Storage::fake('public');
+        Storage::fake();
 
         $user = User::factory()->create()->first();
         $office = Office::factory()->for($user)->create();
@@ -32,7 +32,7 @@ class OfficeImageControllerTest extends TestCase
 
         $response->assertCreated();
 
-        Storage::disk('public')->assertExists(
+        Storage::assertExists(
             $response->json('data.path')
         );
     }
@@ -42,7 +42,7 @@ class OfficeImageControllerTest extends TestCase
     */
     public function itDeleteAnImage()
     {
-        Storage::disk('public')->put('/office_image.jpg', 'empty');
+        Storage::put('/office_image.jpg', 'empty');
 
         $user = User::factory()->create()->first();
         $office = Office::factory()->for($user)->create();
@@ -63,7 +63,7 @@ class OfficeImageControllerTest extends TestCase
 
         $this->assertModelMissing($image);
 
-        Storage::disk('public')->assertMissing('office_image.jpg');
+        Storage::assertMissing('office_image.jpg');
     }
 
     /**
@@ -83,9 +83,7 @@ class OfficeImageControllerTest extends TestCase
 
         $response = $this->deleteJson('/api/offices/' . $office->id . '/images/' . $image->id);
 
-        $response->assertUnprocessable();
-
-        $response->assertJsonValidationErrors(['image' => 'cannot delete this image']);
+        $response->assertNotFound();
     }
 
     /**
