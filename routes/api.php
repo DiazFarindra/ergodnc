@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\{
+    HostReservationController,
     OfficeController,
     OfficeImageController,
-    TagController
+    TagController,
+    UserReservationController
 };
 
 use Illuminate\Http\Request;
@@ -32,4 +34,11 @@ Route::delete('/offices/{office}', [OfficeController::class, 'destroy'])->middle
 
 // offices photos...
 Route::put('/offices/{office}/images', [OfficeImageController::class, 'store'])->middleware(['auth:sanctum', 'verified']);
-Route::delete('/offices/{office}/images/{image}', [OfficeImageController::class, 'destroy'])->middleware(['auth:sanctum', 'verified']);
+Route::delete('/offices/{office}/images/{image:id}', [OfficeImageController::class, 'destroy'])->middleware(['auth:sanctum', 'verified']);
+
+
+// User Reservations...
+Route::get('/reservations', [UserReservationController::class, 'index'])->middleware(['auth:sanctum', 'verified']);
+
+// Host Reservations...
+// Route::get('/host/reservations', [HostReservationController::class, 'index']);
