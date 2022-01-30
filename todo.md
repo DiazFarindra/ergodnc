@@ -77,18 +77,22 @@
 ## TODO 6/9
 - [x] Deleting all image when deleting an office
 - [x] Use the default disk to store public image so it's easier to switch to different drivers in production
-- [] Switch to using sanctum guard by default
 - [x] Use keyed implicit binding in the office image routes so laravel scope to the office that image belongs to [tweet](https://twitter.com/stellamatix)
+
+## TODO 7/9
+- [x] Switch to using sanctum guard by default
+- [x] Use the new [assertNotSoftDeleted](https://github.com/laravel/framework/pull/38886) metod
+- [x] Use the new LazilyRefreshDatabase testing trait on the base test class
 
 ## List Reservations Endpoint
 - [x] Must be authenticated & email verified
 - [x] Token (if exists) must allow `reservations.show`
-- [] Can only list their own reservations or reservations on their offices
-- [] Allow filtering by office_id
-- [] Allow filtering by user_id
-- [] Allow filtering by date range
-- [] Allow filtering by status
-- [] Paginate
+- [x] Can only list their own reservations or reservations on their offices
+- [x] Allow filtering by office_id
+- [x] Allow filtering by user_id
+- [x] Allow filtering by date range
+- [x] Allow filtering by status
+- [x] Paginate
 
 ## Make Reservations Endpoint
 - [] Must be authenticated & email verified
@@ -106,4 +110,7 @@
 - [] Can only cancel their own reservation
 - [] Can only cancel an active reservation that has a start_date in the future
 
-## Handle Billing With Cashier
+## Housekeeping
+- [] Convert filtering reservations by date to eloquent scopes
+- [] Filter offices by tag
+- [] API should return the full URI of the image so that the consumer
