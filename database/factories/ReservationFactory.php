@@ -32,4 +32,13 @@ class ReservationFactory extends Factory
             'end_date' => now()->addDay(5)->format('Y-m-d')
         ];
     }
+
+    public function canceled(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => Reservation::STATUS_CANCELED,
+            ];
+        });
+    }
 }
