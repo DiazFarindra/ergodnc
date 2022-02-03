@@ -98,23 +98,27 @@
 - [x] Convert filtering reservations by date to eloquent scopes
 - [x] Include reservations that started before range and ended after range while filtering
 
+## TODO 9/9
 ## Make Reservations Endpoint
 - [x] Must be authenticated & email verified
 - [x] Token (if exists) must allow `reservations.store`
 - [x] Cannot make revervations on their own property
 - [x] Validate no other reservations conflicts with the same time
 - [x] Use locks to make the process atomic
-- [] Email user & host when reservations is made
-- [] Email user & host on reservations start day
-- [] Generate WIFI password for new reservations (store encrypted)
+- [x] Read request input from the validator output
+- [x] You cant make a reservation on a pending or a hidden office
+- [x] Test you can make reservation starting next day but cant make one on same day
+- [x] Email user & host when reservations is made
+- [x] Email user & host on reservations start day
+- [x] Generate WIFI password for new reservations (store encrypted)
 
 ## Cancel Reservations Endpoint
-- [] Must be authenticated & email verified
-- [] Token (if exists) must allow `reservations.cancel`
-- [] Can only cancel their own reservation
-- [] Can only cancel an active reservation that has a start_date in the future
+- [x] Must be authenticated & email verified
+- [x] Token (if exists) must allow `reservations.cancel`
+- [x] Can only cancel their own reservation
+- [x] Can only cancel an active reservation that has a start_date in the future
 
 ## Housekeeping
-- [] Convert filtering reservations by date to eloquent scopes
-- [] Filter offices by tag
-- [] API should return the full URI of the image so that the consumer
+- [x] Convert filtering reservations by date to eloquent scopes
+- [x] Filter offices by tag
+- [x] API should return the full URI of the image so that the consumer can load it easily
