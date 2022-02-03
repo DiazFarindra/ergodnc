@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ReservationResource;
 use App\Models\Office;
 use App\Models\Reservation;
+use App\Notifications\NewHostReservation;
+use App\Notifications\NewUserReservation;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -54,14 +58,14 @@ class UserReservationController extends Controller
             abort(Response::HTTP_FORBIDDEN);
         };
 
-        validator(request()->all(), [
+        $data = validator(request()->all(), [
             'office_id' => ['required', 'integer'],
-            'start_date' => ['required', 'date:Y-m-d', 'require_with:end_date', 'after:' . now()->addDay()->toDateString()],
-            'end_date' => ['required', 'date:Y-m-d', 'require_with:start_date', 'after:start_date'],
-        ]);
+            'start_date' => ['required', 'date:Y-m-d', 'after:today'],
+            'end_date' => ['required', 'date:Y-m-d', 'after:start_date'],
+        ])->validate();
 
         try {
-            $office = Office::findOrFail(request('office_id'));
+            $office = Office::findOrFail($data['office_id']);
         } catch (ModelNotFoundException $e) {
             throw ValidationException::withMessages([
                 'office_id' => 'Invalid Office ID'
@@ -74,21 +78,21 @@ class UserReservationController extends Controller
             ]);
         }
 
+        if ($office->hidden || $office->approval_status == Office::APPROVAL_PENDING) {
+            throw ValidationException::withMessages([
+                'office_id' => 'You cannot make a reservation on a hidden office'
+            ]);
+        }
+
 
         // create reservation
-        $reservation = Cache::lock('reservation_office_' . $office->id, 10)->block(3, function () use ($office) {
+        $reservation = Cache::lock('reservation_office_' . $office->id, 10)->block(3, function () use ($office, $data) {
             // get total days
-            $numberOfDays = Carbon::parse(request('end_date'))->endOfDay()->diffInDays(
-                Carbon::parse(request('start_date'))->startOfDay()
+            $numberOfDays = Carbon::parse($data['end_date'])->endOfDay()->diffInDays(
+                Carbon::parse($data['start_date'])->startOfDay()
             ) + 1;
 
-            if ($numberOfDays < 2) {
-                throw ValidationException::withMessages([
-                    'start_date' => 'Cannot make reservation less then 2 days'
-                ]);
-            }
-
-            if ($office->reservations()->activeBetween(request('start_date'), request('end_date'))->exists()) {
+            if ($office->reservations()->activeBetween($data['start_date'], $data['end_date'])->exists()) {
                 throw ValidationException::withMessages([
                     'office_id' => 'Office is already reserved during this time'
                 ]);
@@ -103,12 +107,39 @@ class UserReservationController extends Controller
             return Reservation::create([
                 'user_id' => auth()->id(),
                 'office_id' => $office->id,
-                'start_date' => request('start_date'),
-                'end_date' => request('end_date'),
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date'],
                 'status' => Reservation::STATUS_ACTIVE,
                 'price' => $price,
+                'wifi_password' => \Str::random()
             ]);
         });
+
+        Notification::send(auth()->user(), new NewUserReservation($reservation));
+        Notification::send($office->user, new NewHostReservation($reservation));
+
+        return ReservationResource::make($reservation->load('office'));
+    }
+
+    public function cancel(Reservation $reservation)
+    {
+        if (! \auth()->user()->tokenCan('reservations.cancel')) {
+            abort(Response::HTTP_FORBIDDEN);
+        };
+
+        if (
+            $reservation->user_id != auth()->id() ||
+            $reservation->status == Reservation::STATUS_CANCELED ||
+            $reservation->start_date < now()->toDateString()
+            ) {
+            throw ValidationException::withMessages([
+                'reservation' => 'you cannot cancel this reservation!'
+            ]);
+        }
+
+        $reservation->update([
+            'status' => Reservation::STATUS_CANCELED
+        ]);
 
         return ReservationResource::make($reservation->load('office'));
     }
