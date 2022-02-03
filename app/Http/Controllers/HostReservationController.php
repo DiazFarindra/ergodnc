@@ -37,10 +37,7 @@ class HostReservationController extends Controller
             )
             ->when(
                 request('from_date') && request('to_date'),
-                fn ($query) => $query->where(function ($query) {
-                    return $query->whereBetween('start_date', [request('from_date'), request('to_date')])
-                                ->orWhereBetween('end_date', [request('from_date'), request('to_date')]);
-                })
+                fn ($query) => $query->betweenDates(request('from_date'), request('to_date'))
             )
             ->with(['office.featuredImage'])
             ->paginate(20);
