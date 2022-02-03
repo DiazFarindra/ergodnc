@@ -94,12 +94,16 @@
 - [x] Allow filtering by status
 - [x] Paginate
 
+## TODO 8/9
+- [x] Convert filtering reservations by date to eloquent scopes
+- [x] Include reservations that started before range and ended after range while filtering
+
 ## Make Reservations Endpoint
-- [] Must be authenticated & email verified
-- [] Token (if exists) must allow `reservations.show`
-- [] Cannot make revervations on their own property
-- [] Validate no other reservations conflicts with the same time
-- [] Use locks to make the process atomic
+- [x] Must be authenticated & email verified
+- [x] Token (if exists) must allow `reservations.store`
+- [x] Cannot make revervations on their own property
+- [x] Validate no other reservations conflicts with the same time
+- [x] Use locks to make the process atomic
 - [] Email user & host when reservations is made
 - [] Email user & host on reservations start day
 - [] Generate WIFI password for new reservations (store encrypted)
